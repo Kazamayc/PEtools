@@ -5,8 +5,8 @@ char* FileGet(char* PATH);
 void PEHeadGet(char* PATH);
 int main()
 {
-    char a[] = {"C:\\test.exe"};
-    PEHeadGet(a);
+    char PATH[] = {"C:\\test.exe"};
+    PEHeadGet(PATH);
 }
 
 
@@ -46,6 +46,47 @@ void PEHeadGet(char* PATH)
     printf("----------NT HEAD-----------\n");
     printf("----------------------------\n");
     printf(">> DWORD Signature: 0x%X\n",*(int*)(FileBuffer + e_lfanew));
+    printf("----------------------------\n");
+    printf("----------PE HEAD-----------\n");
+    printf("----------------------------\n");
+    printf(">> WORD Machine: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 4));
+    printf(">> WORD NumberOfSections: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 6));
+    printf(">> DWORD TimeDataStamp: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 8));
+    printf(">> WORD SizeOfOptionalHeader: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 20));
+    printf(">> WORD Characteristics: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 22));
+    printf("----------------------------\n");
+    printf("-----------OPTION HEAD------\n");
+    printf("----------------------------\n");
+    printf(">> WORD Magic: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 24));
+    printf(">> DWORD SizeOfCode: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 28));
+    printf(">> DWORD SizeOfInitializedData: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 32));
+    printf(">> DWORD SizeOfUninitializedData: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 36));
+    printf(">> DWORD AddressOfEntryPoint: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 40));
+    printf(">> DWORD BaseOfCode: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 44));
+    printf(">> DWORD BaseOfData: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 48));
+    printf(">> DWORD ImageBase: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 52));
+    printf(">> DWORD SectionAlignment: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 56));
+    printf(">> DWORD FileAlignment: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 60));
+    printf(">> DWORD SizeOfImage: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 80));
+    printf(">> DWORD SizeOfHeaders: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 84));
+    printf(">> DWORD NumberOfRvaAndSizes: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 116));
+
+    //Print section table
+    printf("----------------------------\n");
+    printf("----------SECTION TABLE-----\n");
+    printf("----------------------------\n");
+    int SizeOfOptionalHeader = *(short*)(FileBuffer + e_lfanew + 20) + e_lfanew + 24;
+    char Name[8];
+    printf(">> BYTE Name[IMAGE_SIZEOF_SHORT_NAME]: 0x");
+    for(int x=0, y=7; x<8; x++,y--)
+    {
+        Name[y] = *(char*)(FileBuffer+SizeOfOptionalHeader+x);
+        printf("%x",Name[x]);
+    }
+    printf("\n>> DWORD VirtualAddress: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+12));
+    printf(">> DWORD SizeOfRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+16));
+    printf(">> DWORD PointerToRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+20));
+    printf(">> DWORD Characteristics: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+36));
 
 
     free(FileBuffer);
