@@ -2,6 +2,6 @@
 #include "PEtools.h"
 int main()
 {
-    char PATH[] = {"D:/code/fg.exe"};
+    char PATH[] = {"C:/Windows/System32/notepad.exe"};
     PEHeadGet(PATH);
 }
