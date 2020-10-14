@@ -65,7 +65,7 @@ void PEHeadGet(char* PATH)
     printf("----------------------------\n");
     printf("----------SECTION TABLE-----\n");
     printf("----------------------------\n");
-    int SizeOfOptionalHeader = *(short*)(FileBuffer + e_lfanew + 20) + e_lfanew + 24;
+    int SizeOfPE = *(short*)(FileBuffer + e_lfanew + 20) + e_lfanew + 24;
     int NumberOfSections = *(short*)(FileBuffer + e_lfanew + 6);
     int count = 0;
     while(NumberOfSections>0 )
@@ -74,14 +74,15 @@ void PEHeadGet(char* PATH)
         printf(">> BYTE Name[IMAGE_SIZEOF_SHORT_NAME]: 0x");
         for(int x=0, y=7; x<8; x++,y--)
         {
-            Name[y] = *(char*)(FileBuffer+SizeOfOptionalHeader+x+40*count);
+            Name[x] = *(char*)(FileBuffer+SizeOfPE+y+40*count);
             printf("%x",Name[x]);
 
         }
-        printf("\n>> DWORD VirtualAddress: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+12+40*count));
-        printf(">> DWORD SizeOfRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+16+40*count));
-        printf(">> DWORD PointerToRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+20+40*count));
-        printf(">> DWORD Characteristics: 0x%X\n",*(int*)(FileBuffer+SizeOfOptionalHeader+36+40*count));
+        printf("\n>> DWORD VirtualSize: 0x%X\n",*(int*)(FileBuffer+SizeOfPE+8+40*count));
+        printf(">> DWORD VirtualAddress: 0x%X\n",*(int*)(FileBuffer+SizeOfPE+12+40*count));
+        printf(">> DWORD SizeOfRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfPE+16+40*count));
+        printf(">> DWORD PointerToRawData: 0x%X\n",*(int*)(FileBuffer+SizeOfPE+20+40*count));
+        printf(">> DWORD Characteristics: 0x%X\n",*(int*)(FileBuffer+SizeOfPE+36+40*count));
         NumberOfSections--;
         count++;
     }
