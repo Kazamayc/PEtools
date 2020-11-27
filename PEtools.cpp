@@ -45,7 +45,7 @@ void PEHeadGet(char* PATH)
     printf(">> WORD SizeOfOptionalHeader: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 20));
     printf(">> WORD Characteristics: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 22));
     printf("----------------------------\n");
-    printf("-----------OPTION HEAD------\n");
+    printf("----------OPTION HEAD-------\n");
     printf("----------------------------\n");
     printf(">> WORD Magic: 0x%X\n",*(short*)(FileBuffer + e_lfanew + 24));
     printf(">> DWORD SizeOfCode: 0x%X\n",*(int*)(FileBuffer + e_lfanew + 28));
@@ -87,6 +87,27 @@ void PEHeadGet(char* PATH)
         count++;
     }
 
+
+    int DATA_DIRECTORY_VirtualAddress_export = *(int*)(FileBuffer+e_lfanew+120);
+    int DATA_DIRECTORY_FileAddress_export = RVAtoFOA(DATA_DIRECTORY_VirtualAddress_export,FileBuffer);
+    
+    printf("----------------------------\n");
+    printf("----------DATA_DIRECTORY----\n");
+    printf("----------------------------\n");
+
+    printf("----------------------------\n");
+    printf("----------EXPORT_DIRECTORY--\n");
+    printf("----------------------------\n");
+    printf(">> DWORD VirtualAddress: 0x%X\n",DATA_DIRECTORY_VirtualAddress_export);
+    printf(">> DWORD Size: 0x%X\n",*(int*)(FileBuffer+e_lfanew+124));
+    printf("----------------------------");
+    printf(">> DWORD Name: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+12));
+    printf(">> DWORD Base: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+16));
+    printf(">> DWORD NumberOfFunctions: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+20));
+    printf(">> DWORD NumberOfNames: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+24));
+    printf(">> DWORD AddressOfFunctions: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+28));
+    printf(">> DWORD AddressOfNames: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+32));
+    printf(">> DWORD AddressOfNameOrdinals: 0x%X\n",*(int*)(DATA_DIRECTORY_FileAddress_export+FileBuffer+36));
 
 
     free(FileBuffer);
@@ -145,4 +166,45 @@ int getlen(FILE* fp)
     return a;
 }
 
+int RVAtoFOA(int RVA,char* FileBuffer)
+{
+    int FOA=RVA;
+    int e_lfanew = *(int*)(FileBuffer+60);
+    short NumberOfSections = *(short*)(FileBuffer+e_lfanew+6);
+    short SizeOfOptionalHeader = *(short*)(FileBuffer+e_lfanew+20);
+    int SectionAlignment = *(int*)(FileBuffer+e_lfanew+56);
+    int FileAlignment = *(int*)(FileBuffer+e_lfanew+60);
+    int SizeOfHeaders = *(int*)(FileBuffer+e_lfanew+84);
+    if (SectionAlignment==FileAlignment)
+    {
+        return FOA;
+    }
+    if (RVA<=SizeOfHeaders)
+    {
+        return FOA;
+    }
+
+//判断节表
+    int SectionTable = e_lfanew+24+SizeOfOptionalHeader;
+    int VirtualAddress1=0;
+    int VirtualAddress2=0;
+    int PointerToRawData=0;
+    for(int i=0; i<NumberOfSections-1; i++)
+    {
+        VirtualAddress1=*(int*)(FileBuffer+SectionTable+12+i*40);
+        VirtualAddress2=*(int*)(FileBuffer+SectionTable+12+(i+1)*40);
+        PointerToRawData=*(int*)(FileBuffer+SectionTable+20+(i)*40);
+        if(RVA>=VirtualAddress1&&RVA<VirtualAddress2)
+        {
+            FOA=RVA-VirtualAddress1+PointerToRawData;
+            return FOA;
+        }
+    }
+    VirtualAddress1=*(int*)(FileBuffer+SectionTable+12+(NumberOfSections-1)*40);
+    PointerToRawData=*(int*)(FileBuffer+SectionTable+20+(NumberOfSections-1)*40);
+    FOA=RVA-VirtualAddress1+PointerToRawData;
+    return FOA;
+
+
+}
 

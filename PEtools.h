@@ -5,4 +5,5 @@
 int getlen(FILE* fp);
 char* FileGet(char* PATH);
 void PEHeadGet(char* PATH);
+int RVAtoFOA(int RVA,char* FileBuffer);
 #endif
