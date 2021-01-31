@@ -1,4 +1,3 @@
 # PEtools
 
-#This is my frist github project.
-
+只是测试版，存在较多问题且功能不全
