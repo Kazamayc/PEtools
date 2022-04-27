@@ -95,25 +95,25 @@ int get()
 
 int add()
 {
-	char* FileBuffer = NULL;
-	FILE* fp = fopen("D:/code/text/g2.exe","rb");
+    char* FileBuffer = NULL;
+    FILE* fp = fopen("D:/code/text/g2.exe","rb");
     FILE* fp_w = fopen("D:/code/text/g3.exe","wb");
-	if (fp==NULL || fp_w==NULL)
-	{
-		printf("Error to open file!");
-		return 0;
-	}
-	int size = getlen(fp);
-	FileBuffer = (char*)malloc(size);
-	fread(FileBuffer,1,size,fp);
-	if (FileBuffer==NULL)
-	{
-		printf("Error to read file!");
-		return 0;
-	}
+    if (fp==NULL || fp_w==NULL)
+    {
+        printf("Error to open file!");
+        return 0;
+    }
+    int size = getlen(fp);
+    FileBuffer = (char*)malloc(size);
+    fread(FileBuffer,1,size,fp);
+    if (FileBuffer==NULL)
+    {
+        printf("Error to read file!");
+        return 0;
+    }
 
     //定义
-	int e_lfanew = *(int*)(FileBuffer+60);
+    int e_lfanew = *(int*)(FileBuffer+60);
     short NumberOfSections = *(short*)(FileBuffer+e_lfanew+6);
     short SizeOfOptionalHeader = *(short*)(FileBuffer+e_lfanew+20);
     int SectionAlignment = *(int*)(FileBuffer+e_lfanew+56);
@@ -129,16 +129,16 @@ int add()
     memset(FileBuffer,0,size+SectionAlignment);
     fseek(fp, 0, SEEK_SET);
     fread(FileBuffer,1,size,fp);
-	if (FileBuffer==NULL)
-	{
-		printf("Error to read file2!");
-		return 0;
-	}
-	//新增节表
+    if (FileBuffer==NULL)
+    {
+        printf("Error to read file2!");
+        return 0;
+    }
+    //新增节表
 	
 
     
-	*(short*)(FileBuffer+e_lfanew+6) = NumberOfSections+1;
+    *(short*)(FileBuffer+e_lfanew+6) = NumberOfSections+1;
     memcpy((FileBuffer+e_lfanew+24+SizeOfOptionalHeader+NumberOfSections*40),(FileBuffer+e_lfanew+24+SizeOfOptionalHeader),40);
     
     char Name[8]=
@@ -172,7 +172,7 @@ int add()
     free(FileBuffer);
     fclose(fp);
     fclose(fp_w);
-	return PointerToRawData+SizeOfRawData;
+    return PointerToRawData+SizeOfRawData;
 }
 
 int getlen(FILE* fp)
